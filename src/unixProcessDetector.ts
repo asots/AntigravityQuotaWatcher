@@ -149,12 +149,12 @@ export class UnixProcessDetector implements IPlatformStrategy {
             : 'language_server_linux';
 
         return {
-            processNotFound: '未找到 language_server 进程',
-            commandNotAvailable: 'ps/lsof 命令不可用,请检查系统环境',
+            processNotFound: 'language_server process not found',
+            commandNotAvailable: 'ps/lsof commands are unavailable; please check the system environment',
             requirements: [
-                'Antigravity 正在运行',
-                `${processName} 进程存在`,
-                '系统有足够权限执行 ps 和 lsof 命令'
+                'Antigravity is running',
+                `${processName} process is running`,
+                'The system has permission to execute ps and lsof commands'
             ]
         };
     }

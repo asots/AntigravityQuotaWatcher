@@ -41,7 +41,7 @@ export class QuotaService {
 
   setApiMethod(method: QuotaApiMethod): void {
     this.apiMethod = method;
-    console.log(`切换到 API: ${method}`);
+    console.log(`Switching to API: ${method}`);
   }
 
   setAuthInfo(_unused?: any, csrfToken?: string): void {
@@ -98,7 +98,7 @@ export class QuotaService {
    * 成功后会自动恢复轮询
    */
   async retryFromError(pollingInterval: number): Promise<void> {
-    console.log('手动重试获取配额,重新开始完整流程...');
+    console.log('Manual quota retry triggered; restarting full flow...');
     // 重置所有错误计数和状态
     this.consecutiveErrors = 0;
     this.retryCount = 0;
@@ -113,12 +113,12 @@ export class QuotaService {
 
     // 如果获取成功(consecutiveErrors为0),启动轮询
     if (this.consecutiveErrors === 0) {
-      console.log('获取成功,启动轮询...');
+      console.log('Fetch succeeded, starting polling...');
       this.pollingInterval = setInterval(() => {
         this.fetchQuota();
       }, pollingInterval);
     } else {
-      console.log('获取失败,保持停止状态');
+      console.log('Fetch failed, keeping polling stopped');
     }
   }
 
@@ -127,7 +127,7 @@ export class QuotaService {
    * 用于用户手动触发快速刷新,不会重置错误状态
    */
   async quickRefresh(): Promise<void> {
-    console.log('立即刷新配额...');
+    console.log('Triggering immediate quota refresh...');
     // 直接调用内部获取方法,绕过 isRetrying 检查
     await this.doFetchQuota();
   }
@@ -135,7 +135,7 @@ export class QuotaService {
   private async fetchQuota(): Promise<void> {
     // 如果正在重试中，跳过本次调用
     if (this.isRetrying) {
-      console.log('正在重试中，跳过本次轮询...');
+      console.log('Currently retrying; skipping this polling run...');
       return;
     }
 
@@ -147,7 +147,7 @@ export class QuotaService {
    * quickRefresh 和 fetchQuota 都调用此方法
    */
   private async doFetchQuota(): Promise<void> {
-    console.log('开始获取配额信息...');
+    console.log('Starting quota fetch...');
 
     // 通知状态: 正在获取 (仅首次)
     if (this.statusCallback && this.isFirstAttempt) {
@@ -175,11 +175,11 @@ export class QuotaService {
       let snapshot: QuotaSnapshot;
       switch (this.apiMethod) {
         case QuotaApiMethod.GET_USER_STATUS: {
-          console.log('使用 GetUserStatus API');
+          console.log('Using GetUserStatus API');
           const userStatusResponse = await this.makeGetUserStatusRequest();
           const invalid1 = this.getInvalidCodeInfo(userStatusResponse);
           if (invalid1) {
-            console.error('响应 code 异常，跳过更新', invalid1);
+            console.error('Response code invalid; skipping update', invalid1);
             return;
           }
           snapshot = this.parseGetUserStatusResponse(userStatusResponse);
@@ -187,11 +187,11 @@ export class QuotaService {
         }
         case QuotaApiMethod.COMMAND_MODEL_CONFIG:
         default: {
-          console.log('使用 CommandModelConfig API (推荐)');
+          console.log('Using CommandModelConfig API (recommended)');
           const configResponse = await this.makeCommandModelConfigsRequest();
           const invalid2 = this.getInvalidCodeInfo(configResponse);
           if (invalid2) {
-            console.error('响应 code 异常，跳过更新', invalid2);
+            console.error('Response code invalid; skipping update', invalid2);
             return;
           }
           snapshot = this.parseCommandModelConfigsResponse(configResponse);
@@ -207,17 +207,17 @@ export class QuotaService {
       if (this.updateCallback) {
         this.updateCallback(snapshot);
       } else {
-        console.warn('updateCallback 未注册');
+        console.warn('updateCallback is not registered');
       }
     } catch (error: any) {
       this.consecutiveErrors++;
-      console.error(`配额获取失败 (第 ${this.consecutiveErrors} 次):`, error.message);
+      console.error(`Quota fetch failed (attempt ${this.consecutiveErrors}):`, error.message);
 
       // 如果还没达到最大重试次数，进行延迟重试
       if (this.retryCount < this.MAX_RETRY_COUNT) {
         this.retryCount++;
         this.isRetrying = true;
-        console.log(`将在 ${this.RETRY_DELAY_MS / 1000} 秒后进行第 ${this.retryCount} 次重试...`);
+        console.log(`Retry ${this.retryCount} scheduled in ${this.RETRY_DELAY_MS / 1000} seconds...`);
 
         // 通知状态: 正在重试
         if (this.statusCallback) {
@@ -232,7 +232,7 @@ export class QuotaService {
       }
 
       // 达到最大重试次数,停止轮询
-      console.error(`已达到最大重试次数 (${this.MAX_RETRY_COUNT}),停止轮询`);
+      console.error(`Reached max retry count (${this.MAX_RETRY_COUNT}); stopping polling`);
       this.stopPolling(); // 停止定时轮询
 
       if (this.errorCallback) {
@@ -250,20 +250,20 @@ export class QuotaService {
       const response = await this.makeGetUnleashDataRequest();
 
       // 打印完整响应
-      console.log('GetUnleashData 完整响应:', JSON.stringify(response, null, 2));
+      console.log('Full GetUnleashData response:', JSON.stringify(response, null, 2));
 
       // 检查响应中是否包含 userId
       const userId = response?.context?.userId;
       const hasUserId = userId !== undefined && userId !== null && userId !== '';
 
-      console.log(`登录状态检测: ${hasUserId ? '已登录' : '未登录'}`);
+      console.log(`Login status check: ${hasUserId ? 'Logged in' : 'Not logged in'}`);
       if (hasUserId) {
-        console.log(`用户 ID: ${userId?.substring(0, 20)}...`);
+        console.log(`User ID: ${userId?.substring(0, 20)}...`);
       }
 
       return hasUserId;
     } catch (error: any) {
-      console.error('登录状态检测失败:', error.message);
+      console.error('Login status check failed:', error.message);
       // 如果检测失败，假设未登录
       return false;
     }
@@ -289,7 +289,7 @@ export class QuotaService {
     if (this.csrfToken) {
       headers['X-Codeium-Csrf-Token'] = this.csrfToken;
     } else {
-      throw new Error('缺少 CSRF Token');
+      throw new Error('Missing CSRF token');
     }
 
     const doRequest = (useHttps: boolean, port: number) => new Promise((resolve, reject) => {
@@ -305,7 +305,7 @@ export class QuotaService {
         options.rejectUnauthorized = false;
       }
 
-      console.log(`请求地址: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.GET_UNLEASH_DATA_PATH}`);
+      console.log(`Request URL: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.GET_UNLEASH_DATA_PATH}`);
 
       const client = useHttps ? https : http;
       const req = client.request(options, (res: any) => {
@@ -313,19 +313,19 @@ export class QuotaService {
         res.on('data', (chunk: any) => { data += chunk; });
         res.on('end', () => {
           if (res.statusCode !== 200) {
-            reject(new Error(`HTTP 错误: ${res.statusCode}`));
+            reject(new Error(`HTTP error: ${res.statusCode}`));
             return;
           }
           try {
             resolve(JSON.parse(data));
           } catch (error) {
-            reject(new Error(`解析响应失败: ${error}`));
+            reject(new Error(`Failed to parse response: ${error}`));
           }
         });
       });
 
       req.on('error', (error: any) => reject(error));
-      req.on('timeout', () => { req.destroy(); reject(new Error('请求超时')); });
+      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
       req.setTimeout(5000);
       req.write(requestBody);
       req.end();
@@ -337,7 +337,7 @@ export class QuotaService {
       const msg = (error?.message || '').toLowerCase();
       const shouldRetryHttp = this.httpPort !== undefined && (error.code === 'EPROTO' || msg.includes('wrong_version_number'));
       if (shouldRetryHttp) {
-        console.warn('HTTPS 失败，尝试 HTTP fallback 端口:', this.httpPort);
+        console.warn('HTTPS failed; trying HTTP fallback port:', this.httpPort);
         return await doRequest(false, this.httpPort!);
       }
       throw error;
@@ -361,9 +361,9 @@ export class QuotaService {
 
     if (this.csrfToken) {
       headers['X-Codeium-Csrf-Token'] = this.csrfToken;
-      console.log('使用 CSRF token:', this.csrfToken.substring(0, 4) + '...');
+      console.log('Using CSRF token:', this.csrfToken.substring(0, 4) + '...');
     } else {
-      throw new Error('缺少 CSRF Token');
+      throw new Error('Missing CSRF token');
     }
 
     const doRequest = (useHttps: boolean, port: number) => new Promise((resolve, reject) => {
@@ -379,7 +379,7 @@ export class QuotaService {
         options.rejectUnauthorized = false;
       }
 
-      console.log(`请求地址: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.GET_USER_STATUS_PATH}`);
+      console.log(`Request URL: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.GET_USER_STATUS_PATH}`);
       // console.log('请求头:', JSON.stringify(headers, null, 2));
       // console.log('请求体:', requestBody);
 
@@ -389,19 +389,19 @@ export class QuotaService {
         res.on('data', (chunk: any) => { data += chunk; });
         res.on('end', () => {
           if (res.statusCode !== 200) {
-            reject(new Error(`HTTP 错误: ${res.statusCode}`));
+            reject(new Error(`HTTP error: ${res.statusCode}`));
             return;
           }
           try {
             resolve(JSON.parse(data));
           } catch (error) {
-            reject(new Error(`解析响应失败: ${error}`));
+            reject(new Error(`Failed to parse response: ${error}`));
           }
         });
       });
 
       req.on('error', (error: any) => reject(error));
-      req.on('timeout', () => { req.destroy(); reject(new Error('请求超时')); });
+      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
       req.setTimeout(5000);
       req.write(requestBody);
       req.end();
@@ -413,7 +413,7 @@ export class QuotaService {
       const msg = (error?.message || '').toLowerCase();
       const shouldRetryHttp = this.httpPort !== undefined && (error.code === 'EPROTO' || msg.includes('wrong_version_number'));
       if (shouldRetryHttp) {
-        console.warn('HTTPS 失败，尝试 HTTP fallback 端口:', this.httpPort);
+        console.warn('HTTPS failed; trying HTTP fallback port:', this.httpPort);
         return await doRequest(false, this.httpPort!);
       }
       throw error;
@@ -437,9 +437,9 @@ export class QuotaService {
 
     if (this.csrfToken) {
       headers['X-Codeium-Csrf-Token'] = this.csrfToken;
-      console.log('使用 CSRF token:', this.csrfToken.substring(0, 4) + '...');
+      console.log('Using CSRF token:', this.csrfToken.substring(0, 4) + '...');
     } else {
-      throw new Error('缺少 CSRF Token');
+      throw new Error('Missing CSRF token');
     }
 
     const doRequest = (useHttps: boolean, port: number) => new Promise((resolve, reject) => {
@@ -454,9 +454,9 @@ export class QuotaService {
         options.rejectUnauthorized = false;
       }
 
-      console.log(`请求地址: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.COMMAND_MODEL_CONFIG_PATH}`);
-      console.log('请求头:', JSON.stringify(headers, null, 2));
-      console.log('请求体:', requestBody);
+      console.log(`Request URL: ${useHttps ? 'https' : 'http'}://127.0.0.1:${port}${this.COMMAND_MODEL_CONFIG_PATH}`);
+      console.log('Request headers:', JSON.stringify(headers, null, 2));
+      console.log('Request body:', requestBody);
 
       const client = useHttps ? https : http;
       const req = client.request(options, (res: any) => {
@@ -464,19 +464,19 @@ export class QuotaService {
         res.on('data', (chunk: any) => { data += chunk; });
         res.on('end', () => {
           if (res.statusCode !== 200) {
-            reject(new Error(`HTTP 错误: ${res.statusCode}`));
+            reject(new Error(`HTTP error: ${res.statusCode}`));
             return;
           }
           try {
             resolve(JSON.parse(data));
           } catch (error) {
-            reject(new Error(`解析响应失败: ${error}`));
+            reject(new Error(`Failed to parse response: ${error}`));
           }
         });
       });
 
       req.on('error', (error: any) => reject(error));
-      req.on('timeout', () => { req.destroy(); reject(new Error('请求超时')); });
+      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
       req.setTimeout(5000);
       req.write(requestBody);
       req.end();
@@ -488,7 +488,7 @@ export class QuotaService {
       const msg = (error?.message || '').toLowerCase();
       const shouldRetryHttp = this.httpPort !== undefined && (error.code === 'EPROTO' || msg.includes('wrong_version_number'));
       if (shouldRetryHttp) {
-        console.warn('HTTPS 失败，尝试 HTTP fallback 端口:', this.httpPort);
+        console.warn('HTTPS failed; trying HTTP fallback port:', this.httpPort);
         return await doRequest(false, this.httpPort!);
       }
       throw error;
@@ -510,7 +510,7 @@ export class QuotaService {
 
   private parseGetUserStatusResponse(response: UserStatusResponse): QuotaSnapshot {
     if (!response || !response.userStatus) {
-      throw new Error('API 响应格式不正确，缺少 userStatus');
+      throw new Error('API response format is invalid; missing userStatus');
     }
 
     const userStatus = response.userStatus;
@@ -564,7 +564,7 @@ export class QuotaService {
 
   private formatTimeUntilReset(ms: number): string {
     if (ms <= 0) {
-      return '已过期';
+      return 'Expired';
     }
 
     const seconds = Math.floor(ms / 1000);
@@ -573,13 +573,13 @@ export class QuotaService {
     const days = Math.floor(hours / 24);
 
     if (days > 0) {
-      return `${days}天${hours % 24}小时后`;
+      return `${days}d${hours % 24}h from now`;
     } else if (hours > 0) {
-      return `${hours}小时${minutes % 60}分钟后`;
+      return `${hours}h ${minutes % 60}m from now`;
     } else if (minutes > 0) {
-      return `${minutes}分钟${seconds % 60}秒后`;
+      return `${minutes}m ${seconds % 60}s from now`;
     }
-    return `${seconds}秒后`;
+    return `${seconds}s from now`;
   }
 
   private getInvalidCodeInfo(response: any): { code: any; message?: any } | null {

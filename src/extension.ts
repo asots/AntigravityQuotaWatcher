@@ -56,16 +56,16 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!detectedPort || !detectedCsrfToken) {
     console.error('Missing port or CSRF Token, extension cannot start');
     console.error('Please ensure Antigravity language server is running');
-    statusBarService.showError('检测失败');
+    statusBarService.showError('Detection failed');
     statusBarService.show();
 
     // 显示用户提示,提供重试选项
     vscode.window.showWarningMessage(
-      'Antigravity Quota Watcher: 无法检测到 Antigravity 进程。请确认是否Google账户是否已成功登录。',
-      '重试',
-      '取消'
+      'Antigravity Quota Watcher: Unable to detect the Antigravity process. Please verify your Google account is signed in.',
+      'Retry',
+      'Cancel'
     ).then(action => {
-      if (action === '重试') {
+      if (action === 'Retry') {
         vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
       }
     });
@@ -105,7 +105,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Register login status callback
     quotaService.onLoginStatusChange((isLoggedIn: boolean) => {
       if (!isLoggedIn) {
-        console.log('用户未登录 Antigravity');
+        console.log('User is not logged in to Antigravity');
         statusBarService?.showNotLoggedIn();
       }
     });
@@ -139,11 +139,11 @@ export async function activate(context: vscode.ExtensionContext) {
     'antigravity-quota-watcher.quickRefreshQuota',
     async () => {
       if (!quotaService) {
-        vscode.window.showWarningMessage('配额服务未初始化');
+        vscode.window.showWarningMessage('Quota service is not initialized');
         return;
       }
 
-      console.log('用户触发快速刷新配额');
+      console.log('User triggered quick quota refresh');
       // 显示刷新中状态(旋转图标)
       statusBarService?.showQuickRefreshing();
       // 立即刷新一次,不中断轮询
@@ -156,11 +156,11 @@ export async function activate(context: vscode.ExtensionContext) {
     'antigravity-quota-watcher.refreshQuota',
     async () => {
       if (!quotaService) {
-        vscode.window.showWarningMessage('配额服务未初始化');
+        vscode.window.showWarningMessage('Quota service is not initialized');
         return;
       }
 
-      vscode.window.showInformationMessage('🔄 重新获取配额中...');
+      vscode.window.showInformationMessage('🔄 Refreshing quota...');
       config = configService!.getConfig();
       statusBarService?.setWarningThreshold(config.warningThreshold);
       statusBarService?.setCriticalThreshold(config.criticalThreshold);
@@ -183,11 +183,11 @@ export async function activate(context: vscode.ExtensionContext) {
     'antigravity-quota-watcher.retryLoginCheck',
     async () => {
       if (!quotaService) {
-        vscode.window.showWarningMessage('配额服务未初始化，请先检测端口');
+        vscode.window.showWarningMessage('Quota service is not initialized, please detect the port first');
         return;
       }
 
-      vscode.window.showInformationMessage('🔄 正在重新检测登录状态...');
+      vscode.window.showInformationMessage('🔄 Rechecking login status...');
       statusBarService?.showFetching();
 
       // 立即触发一次配额获取，会自动检测登录状态
@@ -206,7 +206,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const detectPortCommand = vscode.commands.registerCommand(
     'antigravity-quota-watcher.detectPort',
     async () => {
-      vscode.window.showInformationMessage('🔍 正在重新检测端口...');
+      vscode.window.showInformationMessage('🔍 Detecting port again...');
 
       config = configService!.getConfig();
       statusBarService?.setWarningThreshold(config.warningThreshold);
@@ -235,7 +235,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
             quotaService.onLoginStatusChange((isLoggedIn: boolean) => {
               if (!isLoggedIn) {
-                console.log('用户未登录 Antigravity');
+                console.log('User is not logged in to Antigravity');
                 statusBarService?.showNotLoggedIn();
               }
             });
@@ -254,18 +254,18 @@ export async function activate(context: vscode.ExtensionContext) {
             : QuotaApiMethod.GET_USER_STATUS);
           quotaService.startPolling(config.pollingInterval);
 
-          vscode.window.showInformationMessage(`✅ 检测成功! 端口: ${result.port}`);
+          vscode.window.showInformationMessage(`✅ Detection successful! Port: ${result.port}`);
         } else {
           vscode.window.showErrorMessage(
-            '❌ 无法检测到有效端口。请确保:\n' +
-            '1. Google账户已成功登录\n' +
-            '2. 系统有足够权限执行检测命令'
+            '❌ Unable to detect a valid port. Please ensure:\n' +
+            '1. Your Google account is signed in\n' +
+            '2. The system has permission to run the detection commands'
           );
         }
       } catch (error: any) {
         const errorMsg = error?.message || String(error);
-        console.error('端口检测失败:', errorMsg);
-        vscode.window.showErrorMessage(`❌ 端口检测失败: ${errorMsg}`);
+        console.error('Port detection failed:', errorMsg);
+        vscode.window.showErrorMessage(`❌ Port detection failed: ${errorMsg}`);
       }
     }
   );

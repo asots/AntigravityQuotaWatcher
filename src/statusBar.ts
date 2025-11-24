@@ -121,7 +121,7 @@ export class StatusBarService {
   }
 
   private updateTooltip(snapshot: QuotaSnapshot): void {
-    const lines: string[] = ['Antigravity 模型配额信息', ''];
+    const lines: string[] = ['Antigravity model quota details', ''];
 
     if (this.showPromptCredits && snapshot.promptCredits) {
       lines.push('💳 Prompt Credits');
@@ -137,10 +137,10 @@ export class StatusBarService {
       if (model.isExhausted) {
         lines.push('  ⚠️ Quota depleted');
       } else if (model.remainingPercentage !== undefined) {
-        lines.push(`  剩余: ${model.remainingPercentage.toFixed(1)}%`);
+        lines.push(`  Remaining: ${model.remainingPercentage.toFixed(1)}%`);
       }
 
-      lines.push(`  重置时间： ${model.timeUntilResetFormatted}`);
+      lines.push(`  Reset time: ${model.timeUntilResetFormatted}`);
       lines.push('');
     }
 
@@ -253,42 +253,42 @@ export class StatusBarService {
     if (!currentText.startsWith('$(sync~spin)')) {
       this.statusBarItem.text = `$(sync~spin) ${currentText}`;
     }
-    this.statusBarItem.tooltip = '正在刷新配额...\n\n' + (this.statusBarItem.tooltip || '');
+    this.statusBarItem.tooltip = 'Refreshing quota...\n\n' + (this.statusBarItem.tooltip || '');
     this.statusBarItem.show();
   }
 
   showDetecting(): void {
-    this.statusBarItem.text = '🔍 检测端口中...';
+    this.statusBarItem.text = '🔍 Detecting port...';
     this.statusBarItem.backgroundColor = undefined;
-    this.statusBarItem.tooltip = '正在检测 Antigravity 进程端口...';
+    this.statusBarItem.tooltip = 'Detecting Antigravity process ports...';
     this.statusBarItem.show();
   }
 
   showInitializing(): void {
-    this.statusBarItem.text = '⏳ 初始化中...';
+    this.statusBarItem.text = '⏳ Initializing...';
     this.statusBarItem.backgroundColor = undefined;
-    this.statusBarItem.tooltip = '正在初始化配额监控服务...';
+    this.statusBarItem.tooltip = 'Initializing quota monitoring service...';
     this.statusBarItem.show();
   }
 
   showFetching(): void {
-    this.statusBarItem.text = '$(sync~spin) 获取配额中...';
+    this.statusBarItem.text = '$(sync~spin) Fetching quota...';
     this.statusBarItem.backgroundColor = undefined;
-    this.statusBarItem.tooltip = '正在从 Antigravity 获取配额信息...';
+    this.statusBarItem.tooltip = 'Fetching quota information from Antigravity...';
     this.statusBarItem.show();
   }
 
   showRetrying(currentRetry: number, maxRetries: number): void {
-    this.statusBarItem.text = `$(sync~spin) 重试中 (${currentRetry}/${maxRetries})...`;
+    this.statusBarItem.text = `$(sync~spin) Retrying (${currentRetry}/${maxRetries})...`;
     this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-    this.statusBarItem.tooltip = `配额获取失败，正在进行第 ${currentRetry} 次重试...`;
+    this.statusBarItem.tooltip = `Quota fetch failed; running retry ${currentRetry} of ${maxRetries}...`;
     this.statusBarItem.show();
   }
 
   showError(message: string): void {
     this.statusBarItem.text = '$(error) Antigravity Quota Watcher: Error';
     this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
-    this.statusBarItem.tooltip = `${message}\n\n点击此处重试获取配额`;
+    this.statusBarItem.tooltip = `${message}\n\nClick to retry fetching quota`;
     // 修改命令为刷新配额
     this.statusBarItem.command = 'antigravity-quota-watcher.refreshQuota';
     this.statusBarItem.show();
@@ -302,10 +302,10 @@ export class StatusBarService {
   }
 
   showNotLoggedIn(): void {
-    this.statusBarItem.text = '$(account) 未登录 Antigravity';
+    this.statusBarItem.text = '$(account) Not logged in to Antigravity';
     this.statusBarItem.backgroundColor = undefined;
     this.statusBarItem.color = new vscode.ThemeColor('statusBarItem.warningForeground');
-    this.statusBarItem.tooltip = '请先登录 Google 账户以查看模型配额信息\n\n点击此处重新检测登录状态';
+    this.statusBarItem.tooltip = 'Sign in to your Google account to view model quota information\n\nClick to recheck login status';
     // 修改命令为重新检测
     this.statusBarItem.command = 'antigravity-quota-watcher.retryLoginCheck';
     this.statusBarItem.show();

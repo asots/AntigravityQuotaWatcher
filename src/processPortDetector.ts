@@ -41,7 +41,7 @@ export class ProcessPortDetector {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🔍 尝试检测 Antigravity 进程 (${platformName}, 第 ${attempt}/${maxRetries} 次)...`);
+        console.log(`🔍 Attempting to detect Antigravity process (${platformName}, try ${attempt}/${maxRetries})...`);
 
         // Fetch full command line for the language server process using platform-specific command
         const command = this.platformStrategy.getProcessListCommand(this.processName);
@@ -51,63 +51,63 @@ export class ProcessPortDetector {
         const processInfo = this.platformStrategy.parseProcessInfo(stdout);
 
         if (!processInfo) {
-          console.warn(`⚠️ 第 ${attempt} 次尝试: ${errorMessages.processNotFound}`);
+          console.warn(`⚠️ Attempt ${attempt}: ${errorMessages.processNotFound}`);
           throw new Error(errorMessages.processNotFound);
         }
 
         const { pid, extensionPort, csrfToken } = processInfo;
 
-        console.log(`✅ 找到进程信息:`);
+        console.log('✅ Found process info:');
         console.log(`   PID: ${pid}`);
-        console.log(`   extension_server_port: ${extensionPort || '(未找到)'}`);
+        console.log(`   extension_server_port: ${extensionPort || '(not found)'}`);
         console.log(`   CSRF Token: ${csrfToken.substring(0, 8)}...`);
 
         // 获取该进程监听的所有端口
-        console.log(`🔍 正在获取 PID ${pid} 监听的端口...`);
+        console.log(`🔍 Fetching listening ports for PID ${pid}...`);
         const listeningPorts = await this.getProcessListeningPorts(pid);
 
         if (listeningPorts.length === 0) {
-          console.warn(`⚠️ 第 ${attempt} 次尝试: 进程未监听任何端口`);
-          throw new Error('进程未监听任何端口');
+          console.warn(`⚠️ Attempt ${attempt}: process is not listening on any ports`);
+          throw new Error('Process is not listening on any ports');
         }
 
-        console.log(`✅ 找到 ${listeningPorts.length} 个监听端口: ${listeningPorts.join(', ')}`);
+        console.log(`✅ Found ${listeningPorts.length} listening ports: ${listeningPorts.join(', ')}`);
 
         // 逐个测试端口，找到能响应 API 的端口
-        console.log(`🔍 开始测试端口连接性...`);
+        console.log('🔍 Testing port connectivity...');
         const connectPort = await this.findWorkingPort(listeningPorts, csrfToken);
 
         if (!connectPort) {
-          console.warn(`⚠️ 第 ${attempt} 次尝试: 所有端口测试均失败`);
-          throw new Error('无法找到可用的 API 端口');
+          console.warn(`⚠️ Attempt ${attempt}: all port tests failed`);
+          throw new Error('Unable to find a working API port');
         }
 
-        console.log(`✅ 第 ${attempt} 次尝试成功!`);
-        console.log(`✅ API 端口 (HTTPS): ${connectPort}`);
+        console.log(`✅ Attempt ${attempt} succeeded!`);
+        console.log(`✅ API port (HTTPS): ${connectPort}`);
 
         return { extensionPort, connectPort, csrfToken };
 
       } catch (error: any) {
         const errorMsg = error?.message || String(error);
-        console.error(`❌ 第 ${attempt} 次尝试失败:`, errorMsg);
+        console.error(`❌ Attempt ${attempt} failed:`, errorMsg);
 
         // 提供更具体的错误提示
         if (errorMsg.includes('timeout')) {
-          console.error('   原因: 命令执行超时,系统可能负载较高');
+          console.error('   Reason: command execution timed out; the system may be under heavy load');
         } else if (errorMsg.includes('not found') || errorMsg.includes('not recognized')) {
-          console.error(`   原因: ${errorMessages.commandNotAvailable}`);
+          console.error(`   Reason: ${errorMessages.commandNotAvailable}`);
         }
       }
 
       // 如果还有重试机会,等待后重试
       if (attempt < maxRetries) {
-        console.log(`⏳ 等待 ${retryDelay}ms 后重试...`);
+        console.log(`⏳ Waiting ${retryDelay}ms before retrying...`);
         await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
     }
 
-    console.error(`❌ 所有 ${maxRetries} 次尝试均失败`);
-    console.error('   请确保:');
+    console.error(`❌ All ${maxRetries} attempts failed`);
+    console.error('   Please ensure:');
     errorMessages.requirements.forEach((req, index) => {
       console.error(`   ${index + 1}. ${req}`);
     });
@@ -127,7 +127,7 @@ export class ProcessPortDetector {
       const ports = this.platformStrategy.parseListeningPorts(stdout);
       return ports;
     } catch (error) {
-      console.error('获取监听端口失败:', error);
+      console.error('Failed to fetch listening ports:', error);
       return [];
     }
   }
@@ -137,13 +137,13 @@ export class ProcessPortDetector {
    */
   private async findWorkingPort(ports: number[], csrfToken: string): Promise<number | null> {
     for (const port of ports) {
-      console.log(`  🔍 测试端口 ${port}...`);
+      console.log(`  🔍 Testing port ${port}...`);
       const isWorking = await this.testPortConnectivity(port, csrfToken);
       if (isWorking) {
-        console.log(`  ✅ 端口 ${port} 测试成功!`);
+        console.log(`  ✅ Port ${port} test succeeded!`);
         return port;
       } else {
-        console.log(`  ❌ 端口 ${port} 测试失败`);
+        console.log(`  ❌ Port ${port} test failed`);
       }
     }
     return null;

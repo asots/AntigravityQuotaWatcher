@@ -62,6 +62,8 @@
 
  安装插件，重启 Antigravity
 
+ ![Installation](install.png)
+
 ### 命令面板
 
 按 `Ctrl+Shift+P`（Windows）或 `Cmd+Shift+P`（Mac）打开命令面板，输入以下命令：

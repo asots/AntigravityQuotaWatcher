@@ -254,6 +254,34 @@ export class StatusBarService {
     return `${filled}${empty}`;
   }
 
+  showDetecting(): void {
+    this.statusBarItem.text = '🔍 检测端口中...';
+    this.statusBarItem.backgroundColor = undefined;
+    this.statusBarItem.tooltip = '正在检测 Antigravity 进程端口...';
+    this.statusBarItem.show();
+  }
+
+  showInitializing(): void {
+    this.statusBarItem.text = '⏳ 初始化中...';
+    this.statusBarItem.backgroundColor = undefined;
+    this.statusBarItem.tooltip = '正在初始化配额监控服务...';
+    this.statusBarItem.show();
+  }
+
+  showFetching(): void {
+    this.statusBarItem.text = '$(sync~spin) 获取配额中...';
+    this.statusBarItem.backgroundColor = undefined;
+    this.statusBarItem.tooltip = '正在从 Antigravity 获取配额信息...';
+    this.statusBarItem.show();
+  }
+
+  showRetrying(currentRetry: number, maxRetries: number): void {
+    this.statusBarItem.text = `$(sync~spin) 重试中 (${currentRetry}/${maxRetries})...`;
+    this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+    this.statusBarItem.tooltip = `配额获取失败，正在进行第 ${currentRetry} 次重试...`;
+    this.statusBarItem.show();
+  }
+
   showError(message: string): void {
     this.statusBarItem.text = '$(error) Antigravity Quota Watcher: Error';
     this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');

@@ -26,6 +26,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
   portDetectionService = new PortDetectionService(context);
 
+  // Init status bar
+  statusBarService = new StatusBarService(
+    config.warningThreshold,
+    config.criticalThreshold,
+    config.showPromptCredits,
+    config.displayStyle
+  );
+  // 显示检测状态
+  statusBarService.showDetecting();
+
   // Auto detect port and csrf token
   let detectedPort: number | null = null;
   let detectedCsrfToken: string | null = null;
@@ -41,14 +51,6 @@ export async function activate(context: vscode.ExtensionContext) {
   } catch (error) {
     console.error('Port/CSRF detection failed', error);
   }
-
-  // Init status bar
-  statusBarService = new StatusBarService(
-    config.warningThreshold,
-    config.criticalThreshold,
-    config.showPromptCredits,
-    config.displayStyle
-  );
 
   // Ensure port and CSRF token are available
   if (!detectedPort || !detectedCsrfToken) {
@@ -68,6 +70,9 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
   } else {
+    // 显示初始化状态
+    statusBarService.showInitializing();
+
     // Init quota service
     quotaService = new QuotaService(detectedPort, undefined, detectionResult?.httpPort);
     // Set ports for HTTPS + HTTP fallback
@@ -88,9 +93,21 @@ export async function activate(context: vscode.ExtensionContext) {
       statusBarService?.showError(`Connection failed: ${error.message}`);
     });
 
+    // Register status callback
+    quotaService.onStatus((status: 'fetching' | 'retrying', retryCount?: number) => {
+      if (status === 'fetching') {
+        statusBarService?.showFetching();
+      } else if (status === 'retrying' && retryCount !== undefined) {
+        statusBarService?.showRetrying(retryCount, 3); // MAX_RETRY_COUNT = 3
+      }
+    });
+
     // If enabled, start polling after a short delay
     if (config.enabled) {
       console.log('Starting quota polling after delay...');
+
+      // 显示准备获取配额的状态
+      statusBarService.showFetching();
 
       setTimeout(() => {
         quotaService?.setAuthInfo(undefined, detectedCsrfToken);

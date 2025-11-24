@@ -23,6 +23,7 @@ export class QuotaService {
   private pollingInterval?: NodeJS.Timeout;
   private updateCallback?: (snapshot: QuotaSnapshot) => void;
   private errorCallback?: (error: Error) => void;
+  private statusCallback?: (status: 'fetching' | 'retrying', retryCount?: number) => void;
   private isFirstAttempt: boolean = true;
   private consecutiveErrors: number = 0;
   private retryCount: number = 0;
@@ -67,6 +68,10 @@ export class QuotaService {
     this.errorCallback = callback;
   }
 
+  onStatus(callback: (status: 'fetching' | 'retrying', retryCount?: number) => void): void {
+    this.statusCallback = callback;
+  }
+
   startPolling(intervalMs: number): void {
     this.stopPolling();
     this.fetchQuota();
@@ -90,6 +95,12 @@ export class QuotaService {
     }
 
     console.log('开始获取配额信息...');
+
+    // 通知状态: 正在获取 (仅首次)
+    if (this.statusCallback && this.isFirstAttempt) {
+      this.statusCallback('fetching');
+    }
+
     try {
       let snapshot: QuotaSnapshot;
       switch (this.apiMethod) {
@@ -137,6 +148,11 @@ export class QuotaService {
         this.retryCount++;
         this.isRetrying = true;
         console.log(`将在 ${this.RETRY_DELAY_MS / 1000} 秒后进行第 ${this.retryCount} 次重试...`);
+
+        // 通知状态: 正在重试
+        if (this.statusCallback) {
+          this.statusCallback('retrying', this.retryCount);
+        }
 
         setTimeout(async () => {
           this.isRetrying = false;

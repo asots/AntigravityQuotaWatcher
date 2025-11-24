@@ -9,67 +9,34 @@
 - **智能预警**：配额不足时自动变色提醒
 - **自动检测**：无需手动配置，自动检测 Antigravity 服务端口和认证信息
 
-## 🔧 工作原理
-
-插件通过以下步骤自动监控配额：
-
-1. **进程检测**：扫描系统进程找到 `language_server_windows_x64.exe`
-2. **端口识别**：自动解析进程参数获取 HTTP/HTTPS 端口
-3. **认证获取**：自动提取 CSRF Token 用于 API 认证
-4. **定时轮询**：按设定间隔调用 Antigravity API 获取配额数据
-5. **状态更新**：在状态栏实时显示剩余配额和使用情况
-
 ## ⚙️ 配置选项
 
 打开 VS Code 设置（`文件` > `首选项` > `设置`），搜索 `Antigravity Quota Watcher`：
 
 ### 启用自动监控
-```json
-"antigravityQuotaWatcher.enabled": true
-```
-- **类型**：布尔值
 - **默认值**：`true`
-- **说明**：是否启用自动配额监控
+- **说明**：是否启用配额监控
 
 ### 轮询间隔
-```json
-"antigravityQuotaWatcher.pollingInterval": 60
-```
-- **类型**：数字
 - **默认值**：`60`（秒）
-- **说明**：配额数据刷新频率，建议设置为 30-300 秒
+- **说明**：配额数据刷新频率，建议设置为 30-60 秒
 
 ### 警告阈值
-```json
-"antigravityQuotaWatcher.warningThreshold": 50
-```
-- **类型**：数字
 - **默认值**：`50`（百分比）
 - **说明**：配额低于此百分比时状态栏显示橙色警告
 
 ### 临界阈值
-```json
-"antigravityQuotaWatcher.criticalThreshold": 30
-```
-- **类型**：数字
 - **默认值**：`30`（百分比）
 - **说明**：配额低于此百分比时状态栏显示红色警告
 
 ### API 方法选择
-```json
-"antigravityQuotaWatcher.apiMethod": "GET_USER_STATUS"
-```
-- **类型**：枚举 `"GET_USER_STATUS"` 或 `"COMMAND_MODEL_CONFIG"`
-- **默认值**：`"GET_USER_STATUS"`
 - **说明**：
-  - `GET_USER_STATUS`：获取完整配额信息（推荐）
+  - `GET_USER_STATUS`：获取完整配额信息
   - `COMMAND_MODEL_CONFIG`：兼容模式，适用于部分环境
 
 ## 📋 使用方法
 
-1. **安装插件**：在 VS Code 扩展市场搜索 "Antigravity Quota Watcher" 并安装
-2. **启动 Antigravity**：确保 Antigravity 客户端正在运行
-3. **自动监控**：插件会自动检测并开始监控，状态栏显示配额信息
+ 安装插件，重启 Antigravity
 
 ### 命令面板
 
@@ -77,7 +44,7 @@
 
 - **Antigravity: 刷新配额** - 手动刷新配额数据
 - **Antigravity: 重新检测端口** - 重新检测 Antigravity 服务端口
-- **Antigravity: 显示配额详情** - 查看详细配额信息（开发中）
+
 
 ## 🎯 状态栏说明
 

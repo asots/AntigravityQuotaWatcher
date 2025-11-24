@@ -54,9 +54,19 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!detectedPort || !detectedCsrfToken) {
     console.error('Missing port or CSRF Token, extension cannot start');
     console.error('Please ensure language_server_windows_x64.exe is running');
-    statusBarService.showError('Missing CSRF Token');
+    statusBarService.showError('检测失败');
     statusBarService.show();
-    // Do not start polling; wait for manual retry
+
+    // 显示用户提示,提供重试选项
+    vscode.window.showWarningMessage(
+      'Antigravity Quota Watcher: 无法检测到 Antigravity 进程。请确保 Antigravity 正在运行。',
+      '重试',
+      '取消'
+    ).then(action => {
+      if (action === '重试') {
+        vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
+      }
+    });
   } else {
     // Init quota service
     quotaService = new QuotaService(detectedPort, undefined, detectionResult?.httpPort);
@@ -123,26 +133,57 @@ export async function activate(context: vscode.ExtensionContext) {
   const detectPortCommand = vscode.commands.registerCommand(
     'antigravity-quota-watcher.detectPort',
     async () => {
-      vscode.window.showInformationMessage('🔍 Re-detecting port...');
+      vscode.window.showInformationMessage('🔍 正在重新检测端口...');
 
       config = configService!.getConfig();
       statusBarService?.setWarningThreshold(config.warningThreshold);
       statusBarService?.setCriticalThreshold(config.criticalThreshold);
       statusBarService?.setShowPromptCredits(config.showPromptCredits);
       statusBarService?.setDisplayStyle(config.displayStyle);
-      const result = await portDetectionService?.detectPort();
 
-      if (result) {
-        quotaService?.setPorts(result.connectPort, result.httpPort);
-        quotaService?.stopPolling();
-        quotaService?.setApiMethod(config.apiMethod === 'COMMAND_MODEL_CONFIG'
-          ? QuotaApiMethod.COMMAND_MODEL_CONFIG
-          : QuotaApiMethod.GET_USER_STATUS);
-        quotaService?.startPolling(config.pollingInterval);
+      try {
+        const result = await portDetectionService?.detectPort();
 
-        vscode.window.showInformationMessage(`Detected port: ${result.port}, switched automatically`);
-      } else {
-        vscode.window.showErrorMessage('Could not detect valid port, ensure Antigravity is running');
+        if (result && result.port && result.csrfToken) {
+          // 如果之前没有 quotaService,需要初始化
+          if (!quotaService) {
+            quotaService = new QuotaService(result.port, result.csrfToken, result.httpPort);
+            quotaService.setPorts(result.connectPort, result.httpPort);
+
+            // 注册回调
+            quotaService.onQuotaUpdate((snapshot: QuotaSnapshot) => {
+              statusBarService?.updateDisplay(snapshot);
+            });
+
+            quotaService.onError((error: Error) => {
+              console.error('Quota fetch failed:', error);
+              statusBarService?.showError(`Connection failed: ${error.message}`);
+            });
+          } else {
+            // 更新现有服务的端口
+            quotaService.setPorts(result.connectPort, result.httpPort);
+            quotaService.setAuthInfo(undefined, result.csrfToken);
+          }
+
+          quotaService.stopPolling();
+          quotaService.setApiMethod(config.apiMethod === 'COMMAND_MODEL_CONFIG'
+            ? QuotaApiMethod.COMMAND_MODEL_CONFIG
+            : QuotaApiMethod.GET_USER_STATUS);
+          quotaService.startPolling(config.pollingInterval);
+
+          vscode.window.showInformationMessage(`✅ 检测成功! 端口: ${result.port}`);
+        } else {
+          vscode.window.showErrorMessage(
+            '❌ 无法检测到有效端口。请确保:\n' +
+            '1. Antigravity 正在运行\n' +
+            '2. language_server_windows_x64.exe 进程存在\n' +
+            '3. 系统有足够权限执行检测命令'
+          );
+        }
+      } catch (error: any) {
+        const errorMsg = error?.message || String(error);
+        console.error('端口检测失败:', errorMsg);
+        vscode.window.showErrorMessage(`❌ 端口检测失败: ${errorMsg}`);
       }
     }
   );

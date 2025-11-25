@@ -90,7 +90,7 @@
         "antigravityQuotaWatcher.forcePowerShell": {
           "type": "boolean",
           "default": false,
-          "description": "使用 PowerShell 模式检测进程【仅 Windows系统可用】",
+          "description": "使用 PowerShell 模式检测进程【仅 Windows系统可用，插件重启生效】",
           "order": 75
         }
       }

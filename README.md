@@ -60,7 +60,7 @@
 ### PowerShell 模式（仅 Windows 系统可用）
 - **默认值**：`false`
 - **说明**：使用 PowerShell 模式检测进程
-- **适用场景**：如果在 Windows 系统上遇到端口检测错误，可以尝试启用此选项切换到 PowerShell 模式
+- **适用场景**：如果在 Windows 系统上遇到端口检测错误，可以尝试启用此选项切换到 PowerShell 模式。插件重启生效。
 
 ## 使用方法
 

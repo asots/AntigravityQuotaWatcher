@@ -2,7 +2,7 @@
 
 #### Choose Your Language:  简体中文 | [English](./README.en.md)
 
->
+> [!NOTE]
 > 本插件为非官方工具，与 Antigravity 没有任何关联。
 > 本插件依赖于 Antigravity 语言服务器的内部实现细节，相关机制可能会随时变动。
 >
@@ -132,9 +132,16 @@
 - 如果状态栏显示错误，可使用"重新检测端口"命令修复
 - **Windows 用户**：如果遇到端口检测错误，可以在设置中切换 `forcePowerShell` 选项。
 
-## Star History
-
 [![Star History Chart](https://api.star-history.com/svg?repos=wusimpl/AntigravityQuotaWatcher&type=date&legend=top-left)](https://www.star-history.com/#wusimpl/AntigravityQuotaWatcher&type=date&legend=top-left)
+
+## 项目使用约定
+
+本项目基于 MIT 协议开源，使用此项目时请遵守开源协议。  
+除此外，希望你在使用代码时已经了解以下额外说明：
+
+1. 打包、二次分发 **请保留代码出处**：[https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+2. 请不要用于商业用途，合法合规使用代码
+3. 如果开源协议变更，将在此 Github 仓库更新，不另行通知。
 
 ## 许可证
 

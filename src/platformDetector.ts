@@ -30,6 +30,13 @@ export interface IPlatformStrategy {
     } | null;
 
     /**
+     * Ensure port detection commands are available on the system.
+     * Should check for required commands and throw an error with user-friendly message if none are available.
+     * @throws Error if no port detection command is available
+     */
+    ensurePortCommandAvailable(): Promise<void>;
+
+    /**
      * Get the command to list ports listened by a specific process.
      * @param pid Process ID
      * @returns Shell command string

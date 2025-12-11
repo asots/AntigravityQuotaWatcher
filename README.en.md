@@ -1,6 +1,6 @@
 # <img src="./icon.png" width="80" style="vertical-align: middle"> Antigravity Quota Watcher
 
->
+> [!NOTE]
 > This plugin is an unofficial tool and has no affiliation with Antigravity.
 > This plugin relies on internal implementation details of the Antigravity language server, which may change at any time.
 >
@@ -130,9 +130,17 @@ Hover over the status bar to see remaining quota and next reset time for all mod
 - If the status bar shows an error, use the "Re-detect Port" command to fix it
 - **Windows Users**: If you encounter port detection errors, you can toggle the `forcePowerShell` option in settings.
 
-## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=wusimpl/AntigravityQuotaWatcher&type=Date)](https://star-history.com/#wusimpl/AntigravityQuotaWatcher&Date)
+
+## Usage Agreement
+
+This project is open-sourced under the MIT License. Please comply with the open-source license when using this project.  
+In addition, we hope you are aware of the following additional notes when using the code:
+
+1. When packaging or redistributing, **please retain the source attribution**: [https://github.com/wusimpl/AntigravityQuotaWatcher](https://github.com/wusimpl/AntigravityQuotaWatcher)
+2. Please do not use for commercial purposes. Use the code legally and compliantly.
+3. If the open-source license changes, it will be updated in this GitHub repository without separate notice.
 
 ## License
 

@@ -172,6 +172,15 @@ export class WindowsProcessDetector implements IPlatformStrategy {
     }
 
     /**
+     * Ensure port detection commands are available.
+     * On Windows, netstat is always available as a system command.
+     */
+    async ensurePortCommandAvailable(): Promise<void> {
+        // netstat is a built-in Windows command, always available
+        return;
+    }
+
+    /**
      * Get command to list ports for a specific process using netstat.
      */
     getPortListCommand(pid: number): string {

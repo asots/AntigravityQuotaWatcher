@@ -1,16 +1,70 @@
 /**
  * Unix-based (macOS/Linux) process detection implementation.
- * Uses ps and lsof/netstat commands.
+ * Uses ps and lsof/ss/netstat commands.
  */
 
 declare const process: any;
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as vscode from 'vscode';
 import { IPlatformStrategy } from './platformDetector';
+
+const execAsync = promisify(exec);
 
 export class UnixProcessDetector implements IPlatformStrategy {
     private platform: NodeJS.Platform;
+    /** Available port detection command: 'lsof', 'ss', or 'netstat' */
+    private availablePortCommand: 'lsof' | 'ss' | 'netstat' | null = null;
 
     constructor(platform: NodeJS.Platform) {
         this.platform = platform;
+    }
+
+    /**
+     * Check if a command exists on the system using 'which'.
+     */
+    private async commandExists(command: string): Promise<boolean> {
+        try {
+            await execAsync(`which ${command}`, { timeout: 3000 });
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Ensure at least one port detection command is available.
+     * Checks lsof, ss, netstat in order of preference.
+     * @throws Error if no command is available
+     */
+    async ensurePortCommandAvailable(): Promise<void> {
+        // Already checked
+        if (this.availablePortCommand) {
+            return;
+        }
+
+        const commands = ['lsof', 'ss', 'netstat'] as const;
+        const available: string[] = [];
+
+        for (const cmd of commands) {
+            if (await this.commandExists(cmd)) {
+                available.push(cmd);
+                if (!this.availablePortCommand) {
+                    this.availablePortCommand = cmd;
+                }
+            }
+        }
+
+        console.log(`[UnixProcessDetector] Port command check: available=[${available.join(', ') || 'none'}], using=${this.availablePortCommand || 'none'}`);
+
+        if (!this.availablePortCommand) {
+            const message = this.platform === 'darwin'
+                ? 'Port detection requires lsof or netstat. Please install lsof: brew install lsof'
+                : 'Port detection requires lsof, ss, or netstat. Please install one of them:\n• Debian/Ubuntu: sudo apt install lsof\n• Alpine: sudo apk add lsof\n• Or use ss (usually pre-installed): sudo apt install iproute2';
+            
+            vscode.window.showErrorMessage(message, { modal: false });
+            throw new Error('No port detection command available (lsof/ss/netstat)');
+        }
     }
 
     /**
@@ -99,23 +153,32 @@ export class UnixProcessDetector implements IPlatformStrategy {
 
     /**
      * Get command to list ports for a specific process.
-     * Tries lsof first (more reliable), falls back to netstat.
+     * Uses the available command detected by ensurePortCommandAvailable().
      */
     getPortListCommand(pid: number): string {
-        // lsof is more reliable and available on both macOS and Linux
-        // -P: no port name resolution
-        // -a: AND the conditions
-        // -n: no hostname resolution
-        // -p: process ID
-        // -i: internet connections only
-        return `lsof -Pan -p ${pid} -i 2>/dev/null || netstat -tulpn 2>/dev/null | grep ${pid}`;
+        switch (this.availablePortCommand) {
+            case 'lsof':
+                // lsof: -P no port name resolution, -a AND conditions, -n no hostname resolution
+                return `lsof -Pan -p ${pid} -i`;
+            case 'ss':
+                // ss: -t TCP, -l listening, -n numeric, -p show process
+                return `ss -tlnp 2>/dev/null | grep "pid=${pid},"`;
+            case 'netstat':
+                return `netstat -tulpn 2>/dev/null | grep ${pid}`;
+            default:
+                // Fallback chain if ensurePortCommandAvailable() wasn't called
+                return `lsof -Pan -p ${pid} -i 2>/dev/null || ss -tlnp 2>/dev/null | grep "pid=${pid}," || netstat -tulpn 2>/dev/null | grep ${pid}`;
+        }
     }
 
     /**
-     * Parse lsof/netstat output to extract listening ports.
+     * Parse lsof/ss/netstat output to extract listening ports.
      * 
      * lsof format:
      *   language_ 1234 user  10u  IPv4 0x... 0t0  TCP 127.0.0.1:2873 (LISTEN)
+     * 
+     * ss format (Linux):
+     *   LISTEN  0  128  127.0.0.1:2873  0.0.0.0:*  users:(("language_server",pid=1234,fd=10))
      * 
      * netstat format (Linux):
      *   tcp  0  0  127.0.0.1:2873  0.0.0.0:*  LISTEN  1234/language_server
@@ -130,10 +193,21 @@ export class UnixProcessDetector implements IPlatformStrategy {
         const lines = stdout.trim().split('\n');
 
         for (const line of lines) {
-            // Try lsof format first: look for 127.0.0.1:PORT (LISTEN)
+            // Try lsof format: 127.0.0.1:PORT (LISTEN)
             const lsofMatch = line.match(/127\.0\.0\.1:(\d+).*\(LISTEN\)/);
             if (lsofMatch && lsofMatch[1]) {
                 const port = parseInt(lsofMatch[1], 10);
+                if (!ports.includes(port)) {
+                    ports.push(port);
+                }
+                continue;
+            }
+
+            // Try ss format: 127.0.0.1:PORT or *:PORT in LISTEN state
+            // ss output: LISTEN 0 128 127.0.0.1:2873 0.0.0.0:*
+            const ssMatch = line.match(/LISTEN\s+\d+\s+\d+\s+(?:127\.0\.0\.1|\*):(\d+)/);
+            if (ssMatch && ssMatch[1]) {
+                const port = parseInt(ssMatch[1], 10);
                 if (!ports.includes(port)) {
                     ports.push(port);
                 }
@@ -150,7 +224,7 @@ export class UnixProcessDetector implements IPlatformStrategy {
                 continue;
             }
 
-            // Also try localhost format
+            // Also try localhost format (for lsof/netstat)
             const localhostMatch = line.match(/localhost:(\d+).*\(LISTEN\)|localhost:(\d+).*LISTEN/);
             if (localhostMatch) {
                 const port = parseInt(localhostMatch[1] || localhostMatch[2], 10);

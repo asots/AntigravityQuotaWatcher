@@ -149,6 +149,9 @@ export class ProcessPortDetector {
    */
   private async getProcessListeningPorts(pid: number): Promise<number[]> {
     try {
+      // Ensure port detection command is available before running
+      await this.platformStrategy.ensurePortCommandAvailable();
+
       const command = this.platformStrategy.getPortListCommand(pid);
       console.log(`[PortDetector] Running port list command for PID ${pid}: ${command}`);
       const { stdout } = await execAsync(command, { timeout: 3000 });

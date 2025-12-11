@@ -150,7 +150,9 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       console.log('[Extension] quickRefreshQuota command invoked');
       if (!quotaService) {
-        vscode.window.showWarningMessage('Quota service is not initialized');
+        // quotaService 未初始化，自动委托给 detectPort 命令进行重新检测
+        console.log('[Extension] quotaService not initialized, delegating to detectPort command');
+        await vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
         return;
       }
 
@@ -168,7 +170,9 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       console.log('[Extension] refreshQuota command invoked');
       if (!quotaService) {
-        vscode.window.showWarningMessage('Quota service is not initialized');
+        // quotaService 未初始化，自动委托给 detectPort 命令进行重新检测
+        console.log('[Extension] quotaService not initialized, delegating to detectPort command');
+        await vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
         return;
       }
 
@@ -197,7 +201,9 @@ export async function activate(context: vscode.ExtensionContext) {
     async () => {
       console.log('[Extension] retryLoginCheck command invoked');
       if (!quotaService) {
-        vscode.window.showWarningMessage('Quota service is not initialized, please detect the port first');
+        // quotaService 未初始化，自动委托给 detectPort 命令进行重新检测
+        console.log('[Extension] quotaService not initialized, delegating to detectPort command');
+        await vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
         return;
       }
 

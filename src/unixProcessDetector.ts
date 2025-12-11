@@ -59,9 +59,9 @@ export class UnixProcessDetector implements IPlatformStrategy {
 
         if (!this.availablePortCommand) {
             const message = this.platform === 'darwin'
-                ? 'Port detection requires lsof or netstat. Please install lsof: brew install lsof'
-                : 'Port detection requires lsof, ss, or netstat. Please install one of them:\n• Debian/Ubuntu: sudo apt install lsof\n• Alpine: sudo apk add lsof\n• Or use ss (usually pre-installed): sudo apt install iproute2';
-            
+                ? 'Port detection requires lsof or netstat. Please install one of them'
+                : 'Port detection requires lsof, ss, or netstat. Please install one of them';
+
             vscode.window.showErrorMessage(message, { modal: false });
             throw new Error('No port detection command available (lsof/ss/netstat)');
         }

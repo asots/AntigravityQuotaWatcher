@@ -368,16 +368,6 @@ export class StatusBarService {
     this.statusBarItem.show();
   }
 
-  showNotLoggedIn(): void {
-    this.statusBarItem.text = this.localizationService.t('status.notLoggedIn');
-    this.statusBarItem.backgroundColor = undefined;
-    this.statusBarItem.color = new vscode.ThemeColor('statusBarItem.warningForeground');
-    this.statusBarItem.tooltip = `${this.localizationService.t('tooltip.notLoggedIn')}\n\n${this.localizationService.t('tooltip.clickToRecheck')}`;
-    // 修改命令为重新检测
-    this.statusBarItem.command = 'antigravity-quota-watcher.retryLoginCheck';
-    this.statusBarItem.show();
-  }
-
   show(): void {
     this.statusBarItem.show();
   }

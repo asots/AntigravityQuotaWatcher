@@ -196,33 +196,6 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Command: retry login check
-  const retryLoginCheckCommand = vscode.commands.registerCommand(
-    'antigravity-quota-watcher.retryLoginCheck',
-    async () => {
-      console.log('[Extension] retryLoginCheck command invoked');
-      if (!quotaService) {
-        // quotaService 未初始化，自动委托给 detectPort 命令进行重新检测
-        console.log('[Extension] quotaService not initialized, delegating to detectPort command');
-        await vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
-        return;
-      }
-
-      vscode.window.showInformationMessage(localizationService.t('notify.recheckingLogin'));
-      statusBarService?.showFetching();
-
-      // 立即触发一次配额获取，会自动检测登录状态
-      await quotaService.stopPolling();
-
-      // 使用 setTimeout 确保有足够时间让用户登录
-      setTimeout(() => {
-        if (config.enabled && quotaService) {
-          quotaService.startPolling(config.pollingInterval);
-        }
-      }, 1000);
-    }
-  );
-
   // Command: re-detect port
   const detectPortCommand = vscode.commands.registerCommand(
     'antigravity-quota-watcher.detectPort',
@@ -305,7 +278,6 @@ export async function activate(context: vscode.ExtensionContext) {
     showQuotaCommand,
     quickRefreshQuotaCommand,
     refreshQuotaCommand,
-    retryLoginCheckCommand,
     detectPortCommand,
     configChangeDisposable,
     { dispose: () => quotaService?.dispose() },

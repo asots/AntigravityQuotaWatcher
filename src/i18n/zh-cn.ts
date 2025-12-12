@@ -7,7 +7,6 @@ export const zh_cn: TranslationMap = {
     'status.fetching': '$(sync~spin) 获取配额中...',
     'status.retrying': '$(sync~spin) 重试中 ({current}/{max})...',
     'status.error': '$(error) Antigravity Quota Watcher: 错误',
-    'status.notLoggedIn': '$(account) 未登录',
     'status.refreshing': '$(sync~spin) 刷新中...',
 
     // hover 提示框
@@ -20,17 +19,13 @@ export const zh_cn: TranslationMap = {
     'tooltip.model': '模型',
     'tooltip.status': '剩余',
     'tooltip.error': '获取配额信息时出错。',
-    'tooltip.notLoggedIn': '请登录您的 Google 账户以查看模型配额信息。',
     'tooltip.clickToRetry': '点击重试',
-    'tooltip.clickToRecheck': '点击重新检查登录状态',
 
     // 通知弹窗 (vscode.window.show*Message)
     'notify.unableToDetectProcess': 'Antigravity Quota Watcher: 无法检测到 Antigravity 进程。',
     'notify.retry': '重试',
     'notify.cancel': '取消',
     'notify.refreshingQuota': '🔄 正在刷新配额...',
-    'notify.recheckingLogin': '🔄 正在重新检查登录状态...',
-    'notify.detectingPort': '🔍 正在重新检测端口...',
     'notify.detectionSuccess': '✅ 检测成功！端口: {port}',
     'notify.unableToDetectPort': '❌ 无法检测到有效端口。请确保：',
     'notify.unableToDetectPortHint1': '1. 已登录 Google 账户',

@@ -27,8 +27,6 @@ export function registerDevCommands(context: vscode.ExtensionContext) {
             const notifyKeys: { key: TranslationKey; type: 'info' | 'warning' | 'error' }[] = [
                 { key: 'notify.unableToDetectProcess', type: 'warning' },
                 { key: 'notify.refreshingQuota', type: 'info' },
-                { key: 'notify.recheckingLogin', type: 'info' },
-                { key: 'notify.detectingPort', type: 'info' },
                 { key: 'notify.detectionSuccess', type: 'info' },
                 { key: 'notify.unableToDetectPort', type: 'error' },
                 { key: 'notify.portDetectionFailed', type: 'error' },
@@ -86,7 +84,6 @@ export function registerDevCommands(context: vscode.ExtensionContext) {
                 'status.fetching',
                 'status.retrying',
                 'status.error',
-                'status.notLoggedIn',
                 'status.refreshing',
             ];
 
@@ -116,9 +113,7 @@ export function registerDevCommands(context: vscode.ExtensionContext) {
                 'tooltip.model',
                 'tooltip.status',
                 'tooltip.error',
-                'tooltip.notLoggedIn',
                 'tooltip.clickToRetry',
-                'tooltip.clickToRecheck',
             ];
 
             // 构建完整的 tooltip 预览

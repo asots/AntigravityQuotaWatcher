@@ -5,7 +5,6 @@ export type TranslationKey =
     | 'status.fetching'
     | 'status.retrying'
     | 'status.error'
-    | 'status.notLoggedIn'
     | 'status.refreshing'
 
     // Tooltip
@@ -18,22 +17,13 @@ export type TranslationKey =
     | 'tooltip.model'
     | 'tooltip.status'
     | 'tooltip.error'
-    | 'tooltip.notLoggedIn'
     | 'tooltip.clickToRetry'
-    | 'tooltip.clickToRecheck'
-
-    // Messages
-    | 'msg.portDetectionFailed'
-    | 'msg.portDetectionSuccess'
-    | 'msg.quotaRefreshed'
 
     // Notifications (vscode.window.show*Message)
     | 'notify.unableToDetectProcess'
     | 'notify.retry'
     | 'notify.cancel'
     | 'notify.refreshingQuota'
-    | 'notify.recheckingLogin'
-    | 'notify.detectingPort'
     | 'notify.detectionSuccess'
     | 'notify.unableToDetectPort'
     | 'notify.unableToDetectPortHint1'

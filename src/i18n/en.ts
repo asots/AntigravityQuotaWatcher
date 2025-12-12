@@ -7,7 +7,6 @@ export const en: TranslationMap = {
     'status.fetching': '$(sync~spin) Fetching quota...',
     'status.retrying': '$(sync~spin) Retrying ({current}/{max})...',
     'status.error': '$(error) Antigravity Quota Watcher: Error',
-    'status.notLoggedIn': '$(account) Not logged in',
     'status.refreshing': '$(sync~spin) Refreshing...',
 
     // Tooltip
@@ -20,17 +19,13 @@ export const en: TranslationMap = {
     'tooltip.model': 'Model',
     'tooltip.status': 'Status',
     'tooltip.error': 'Error fetching quota information.',
-    'tooltip.notLoggedIn': 'Sign in to your Google account to view model quota information.',
     'tooltip.clickToRetry': 'Click to retry',
-    'tooltip.clickToRecheck': 'Click to recheck login status',
 
     // Notifications (vscode.window.show*Message)
     'notify.unableToDetectProcess': 'Antigravity Quota Watcher: Unable to detect the Antigravity process.',
     'notify.retry': 'Retry',
     'notify.cancel': 'Cancel',
     'notify.refreshingQuota': '🔄 Refreshing quota...',
-    'notify.recheckingLogin': '🔄 Rechecking login status...',
-    'notify.detectingPort': '🔍 Detecting port again...',
     'notify.detectionSuccess': '✅ Detection successful! Port: {port}',
     'notify.unableToDetectPort': '❌ Unable to detect a valid port. Please ensure:',
     'notify.unableToDetectPortHint1': '1. Your Google account is signed in',

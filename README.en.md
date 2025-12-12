@@ -21,6 +21,10 @@ A VS Code extension for monitoring Antigravity AI model usage quotas, with quota
 
 ![Installation](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/install.png)
 
+
+> [!NOTE]
+> For Linux Distribution System, please make sure it supports one of these commands:`lsof`、`netstat`、`ss`.
+
 ## Submitting Issues
 
 Please attach log files or log screenshots when submitting issues.

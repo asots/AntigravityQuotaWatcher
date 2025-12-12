@@ -23,6 +23,9 @@
 
 ![Installation](https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/install.png)
 
+> [!NOTE]
+> Linux系统平台须知：请确保系统支持以下三种命令之一：`lsof`、`netstat`、`ss`。如果没有，请安装后再重启脚本。
+
 ## 提交Issue
 
 请在提交issue时附上日志文件或者日志截图

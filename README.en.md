@@ -41,7 +41,8 @@
 
 ### Method 1: Install from Open VSX Marketplace (Recommended)
 
-Search for `Antigravity Quota Watcher` in the extension marketplace and click install.
+Search for `wusimpl Antigravity Quota Watcher` in the extension marketplace. Look for the plugin by author `wusimpl`. It is currently ranked lower, so you may need to scroll down to find it. Once found, click install.
+![OpenVSX-Search PNG](./images/openvsx-search.png)
 
 ### Method 2: Manual Installation
 

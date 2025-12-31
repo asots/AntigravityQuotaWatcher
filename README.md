@@ -42,7 +42,9 @@
 
 ### 方式一：插件市场安装（推荐）
 
-在插件市场搜索 `Antigravity Quota Watcher`，点击安装即可。
+在插件市场搜索 `wusimpl Antigravity Quota Watcher`，认准作者为 `wusimpl` 的插件，目前排名靠后，需要往后
+滑动寻找，找到后点击安装即可。
+![OpenVSX-Search PNG](./images/openvsx-search.png)
 
 ### 方式二：手动安装
 

@@ -18,7 +18,7 @@ let configService: ConfigService | undefined;
 let portDetectionService: PortDetectionService | undefined;
 let configChangeTimer: NodeJS.Timeout | undefined;  // 配置变更防抖定时器
 let lastFocusRefreshTime: number = 0;  // 上次焦点刷新时间戳
-const FOCUS_REFRESH_THROTTLE_MS = 30000;  // 焦点刷新节流阈值
+const FOCUS_REFRESH_THROTTLE_MS = 3000;  // 焦点刷新节流阈值
 
 /**
  * Called when the extension is activated

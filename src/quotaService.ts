@@ -329,8 +329,11 @@ export class QuotaService {
           const userStatusResponse = await this.makeGetUserStatusRequest();
           const invalid1 = this.getInvalidCodeInfo(userStatusResponse);
           if (invalid1) {
-            console.error('Response code invalid; skipping update', invalid1);
-            return;
+            console.error('Response code invalid; will treat as error', invalid1);
+            const detail = invalid1.message ? `: ${invalid1.message}` : '';
+            const err = new Error(`Invalid response code ${invalid1.code}${detail}`);
+            err.name = 'QuotaInvalidCodeError';
+            throw err;
           }
           snapshot = this.parseGetUserStatusResponse(userStatusResponse);
           break;
@@ -353,8 +356,11 @@ export class QuotaService {
           const userStatusResponse = await this.makeGetUserStatusRequest();
           const invalid1 = this.getInvalidCodeInfo(userStatusResponse);
           if (invalid1) {
-            console.error('Response code invalid; skipping update', invalid1);
-            return;
+            console.error('Response code invalid; will treat as error', invalid1);
+            const detail = invalid1.message ? `: ${invalid1.message}` : '';
+            const err = new Error(`Invalid response code ${invalid1.code}${detail}`);
+            err.name = 'QuotaInvalidCodeError';
+            throw err;
           }
           snapshot = this.parseGetUserStatusResponse(userStatusResponse);
           break;

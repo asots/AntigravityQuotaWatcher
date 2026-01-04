@@ -24,6 +24,8 @@ let configChangeTimer: NodeJS.Timeout | undefined;  // 配置变更防抖定时�
 let lastFocusRefreshTime: number = 0;  // 上次焦点刷新时间戳
 let globalState: vscode.Memento | undefined;
 const FOCUS_REFRESH_THROTTLE_MS = 3000;  // 焦点刷新节流阈值
+const AUTO_REDETECT_THROTTLE_MS = 30000; // 自动重探端口节流
+let lastAutoRedetectTime: number = 0;
 
 /**
  * Called when the extension is activated
@@ -537,6 +539,18 @@ function registerQuotaServiceCallbacks(): void {
   quotaService.onError((error: Error) => {
     console.error('Quota fetch failed:', error);
     statusBarService?.showError(`Connection failed: ${error.message}`);
+
+    // 自动重探：本地 API 且疑似端口/CSRF 失效时，节流触发 detectPort
+    const apiMethod = quotaService?.getApiMethod();
+    if (shouldAutoRedetectPort(error, apiMethod)) {
+      const now = Date.now();
+      if (now - lastAutoRedetectTime >= AUTO_REDETECT_THROTTLE_MS) {
+        lastAutoRedetectTime = now;
+        vscode.commands.executeCommand('antigravity-quota-watcher.detectPort');
+      } else {
+        console.log('[AutoRedetect] Throttled; skip detectPort this time');
+      }
+    }
   });
 
   // Register status callback
@@ -716,6 +730,33 @@ export function deactivate() {
   console.log('Antigravity Quota Watcher deactivated');
   quotaService?.dispose();
   statusBarService?.dispose();
+}
+
+/**
+ * 判断是否需要自动重探端口/CSRF
+ * 仅在本地 API 模式下对端口/CSRF/连接错误触发
+ */
+function shouldAutoRedetectPort(error: Error, apiMethod: QuotaApiMethod | undefined): boolean {
+  if (!apiMethod || apiMethod === QuotaApiMethod.GOOGLE_API) {
+    return false;
+  }
+
+  const msg = (error?.message || '').toLowerCase();
+  if (!msg) {
+    return false;
+  }
+
+  return (
+    error.name === 'QuotaInvalidCodeError' ||
+    msg.includes('missing csrf') ||
+    msg.includes('csrf token') ||
+    msg.includes('connection refused') ||
+    msg.includes('econnrefused') ||
+    msg.includes('socket') ||
+    msg.includes('port') ||
+    (msg.includes('http error') && msg.includes('403')) ||
+    msg.includes('invalid response code')
+  );
 }
 
 /**

@@ -37,6 +37,13 @@ Open VS Code settings (`File` > `Preferences` > `Settings`), and search for `Ant
 
 > **Acknowledgments**: The Google API quota fetching method is derived from [Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager). Thanks to the author for their contribution!
 
+> [!WARNING]
+> **Security Notice**: The `GOOGLE_API` method requires logging into your Google account to obtain `access token` and `refresh token`. These tokens are **sensitive credentials** - if leaked, anyone can use your `refresh token` to consume your account's AI quota.
+>
+> **Our Commitment**: This project is completely open-source and free. We **never store or upload any user tokens** - all credentials are stored only on your local device.
+>
+> **Risk Warning**: There are currently many fork versions based on this project. Please be vigilant about potential risks. Before installing any quota watching plugins, we recommend using AI tools to review its code to ensure it is safe and free of backdoors.
+
 If you choose the `GOOGLE_API` method, you need to login with your Google account:
 
 **Login Method**:

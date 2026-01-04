@@ -37,6 +37,13 @@
 >
 > **致谢**：Google API 配额获取方法来自 [Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) 项目，感谢作者的贡献！
 
+> [!WARNING]
+> **安全提醒**：`GOOGLE_API` 方法需要登录您的 Google 账号以获取 `access token` 和 `refresh token`。这些 token 属于**敏感凭证信息**，若泄露，他人可通过您的 `refresh token` 使用您账号的 AI 额度。
+>
+> **本项目承诺**：本项目完全开源免费，**绝不保存或上传任何用户 token**，所有凭证仅存储在您本地设备中。
+>
+> **风险警示**：目前基于本项目的 fork 版本较多，请大家注意甄别风险。在安装任何配额插件前，建议先借助 AI 工具审查其代码，确认是否安全、是否存在后门。
+
 如果选择 `GOOGLE_API` 方法，需要使用 Google 账号登录：
 
 **登录方式**：

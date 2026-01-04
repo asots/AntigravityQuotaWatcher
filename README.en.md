@@ -113,7 +113,7 @@ You can customize `warningThreshold` and `criticalThreshold` in settings to adju
 
 ### Model Quota Details
 
-Hover over the status bar to see remaining quota and next reset time for all models. Click the status bar to immediately refresh quota information.
+Hover over the status bar to see remaining quota and next reset time for all models. **Click the status bar to immediately refresh quota information**.
 
 ## Notes
 

@@ -29,8 +29,8 @@
 ## API 方法选择
 - **默认值**：`GET_USER_STATUS`
 - **选项**：
-  - `GOOGLE_API`：**推荐使用** - 直接调用 Google Cloud Code API 获取配额，数据基本是最新的，响应快速
-  - `GET_USER_STATUS`：兼容模式 - 通过本地 Antigravity 语言服务器获取配额，存在较大延迟（因为依赖 LSP）
+  - `GOOGLE_API`：远程模式 - 直接调用 Google Cloud Code API 获取配额，数据基本是最新的，响应快速
+  - `GET_USER_STATUS`：本地模式 - 通过本地 Antigravity 语言服务器获取配额，存在较大延迟（因为依赖 LSP）
 - **说明**：选择配额获取方式
 
 ### Google API 方式使用说明

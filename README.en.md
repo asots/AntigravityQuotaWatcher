@@ -25,7 +25,7 @@
       <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo2-en.png" alt="Quota Details" width="400">
     </td>
     <td align="center">
-      <strong>Config Page</strong><br><br>
+      <strong>Config Page<a href="./CONFIG.md">(Config Doc)</a></strong><br><br>
       <img src="https://raw.githubusercontent.com/wusimpl/AntigravityQuotaWatcher/main/images/demo3.png" alt="Config Page" width="400">
     </td>
   </tr>

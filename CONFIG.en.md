@@ -29,8 +29,8 @@ Open VS Code settings (`File` > `Preferences` > `Settings`), and search for `Ant
 ## API Method Selection
 - **Default**: `GET_USER_STATUS`
 - **Options**:
-  - `GOOGLE_API`: **Recommended** - Directly calls Google Cloud Code API to fetch quota, data is almost real-time with fast response
-  - `GET_USER_STATUS`: Compatibility mode - Fetches quota through local Antigravity language server, has significant delay (depends on LSP)
+  - `GOOGLE_API`: Remote mode - Directly calls Google Cloud Code API to fetch quota, data is almost real-time with fast response
+  - `GET_USER_STATUS`: Local mode - Fetches quota through local Antigravity language server, has significant delay (depends on LSP)
 - **Description**: Choose the quota fetching method
 
 ### Google API Usage Instructions

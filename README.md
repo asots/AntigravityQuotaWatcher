@@ -11,6 +11,9 @@
 > 如需使用，请在配置中切换到**GOOGLE_API**方式获取模型配额（该方法需要登录Google账号），
 > 该方法不依赖于 Antigravity 本地环境，远程SSH项目也适合这种方法。
 
+> [!NOTE]
+> 号外号外！本仓库为vscode插件版，[桌面版](https://github.com/wusimpl/AntigravityQuotaWatcherDesktop)已发布，欢迎下载体验
+
 **一个在Antigravity状态栏实时显示AI模型配额剩余情况的插件。**
 
 ## 演示
